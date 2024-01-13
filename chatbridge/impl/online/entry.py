@@ -3,6 +3,8 @@ A specific client for responding !!online command for multiple bungeecord instan
 """
 import collections
 import functools
+import re
+import sys
 import traceback
 from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Lock
@@ -62,11 +64,10 @@ class OnlineChatClient(ChatBridgeClient):
 	@staticmethod
 	def handle_bungee(updater: Callable[[str, Collection[str]], Any], respond: str):
 		for line in respond.splitlines():
-			if not line.startswith('Total players online:'):
-				server_name = line.split('] (', 1)[0][1:]
-				player_list = set(line.split('): ')[-1].split(', '))
-				if '' in player_list:
-					player_list.remove('')
+			matched = re.fullmatch(r'\[([^]]+)] \(\d+\): (.*)', line)
+			if matched:
+				server_name = matched.group(1)
+				player_list = set(filter(None, matched.group(2).split(', ')))
 				updater(server_name, player_list)
 
 	@staticmethod
@@ -98,7 +99,7 @@ class OnlineChatClient(ChatBridgeClient):
 			for server in config.server_list:
 				pool.submit(self.query_server, server, 'list', lambda data, svr=server: self.handle_minecraft(updater, svr, data))
 			for server in config.bungeecord_list:
-				pool.submit(self.query_server, server, 'glist', lambda data: self.handle_bungee(updater, data))
+				pool.submit(self.query_server, server, 'glist all', lambda data: self.handle_bungee(updater, data))
 
 		counter_sorted = sorted([(key, value) for key, value in counter.items()], key=functools.cmp_to_key(self.server_comparator))
 		player_set_all = set()
@@ -135,7 +136,11 @@ def main():
 	config = utils.load_config(ClientConfigFile, OnlineConfig)
 	chatClient = OnlineChatClient.create(config)
 	utils.start_guardian(chatClient)
-	console_input_loop()
+	if sys.stdin.isatty():
+		console_input_loop()
+	else:
+		utils.wait_until_terminate()
+		chatClient.stop()
 
 
 if __name__ == '__main__':
