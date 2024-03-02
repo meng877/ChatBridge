@@ -1,7 +1,3 @@
-# 重要提示:
-
-项目准备重构部分代码，暂时不要使用
-
 # 免责声明：
 
 此fork专为TQM Craft打造，因此代码中包括若干硬编码常量，缺乏相关的文档/用法等支持
@@ -10,16 +6,17 @@
 
 # 此fork所做的更改:
 
-转发所有信息，不再需要!!qq 和!!mc
+可以通过配置文件控制是否自动转发消息
 
 将CQ码转发成更容易理解的格式
 
 增加指令!!info 基于MCSM api 获取服务器运行情况
 
+将!!online 汉化并添加换行
+
+添加对[ChatImage mod]https://github.com/kitUIN/ChatImage 的支持选项
+
 !!info 效果:![3608cfa99a9ad724f799be77b186288](https://github.com/meng877/ChatBridge/assets/58868172/57b3fe90-56e4-4f16-897d-6af19e2778b3)
-
-
-
 
 # ChatBridge
 
@@ -232,12 +229,17 @@ Extra configure fields (compared to [CLI client](#cli-client))
 
 ```json5
     "ws_address": "127.0.0.1",
+    "gocq_path:str": "",  //gocq文件根目录，用于暂存并发送折线图
     "ws_port": 6700,
     "access_token": "access_token.here",
     "react_group_id": 12345,  // the target QQ group id
     "client_to_query_stats": "MyClient1",  // it should be a client as an MCDR plugin, with stats_helper plugin installed in the MCDR
     "client_to_query_online": "MyClient2",  // a client described in the following section "Client to respond online command"
-    "server_display_name": "TIS"  // The name of the server, used for display in some places
+    "qq_to_mc": True,  //如果为True 则自动转发qq消息到mc
+	"mc_to_qq": False,  //如果为True 则自动转发mc消息到qq
+	"mcsm_api_addr": "",  //MCSM API地址，示例：127.0.0.1:1145 可不填，不填则禁用!!info
+	"mcsm_api_key": "",   //MCSM API KEY
+	"enable_ChatImage_support": False //如果为True 则不会修改图片的cq码，来支持ChatImage mod
 ```
 
 ## Kaiheila bot client
