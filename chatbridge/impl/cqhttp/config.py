@@ -13,4 +13,4 @@ class CqHttpConfig(ClientConfig):
 	mc_to_qq: bool = False
 	mcsm_api_addr: str = ""
 	mcsm_api_key: str = ""
-	enable_ChatImage_support: bool = "false"
+	enable_ChatImage_support: bool = False
