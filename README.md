@@ -236,10 +236,10 @@ Extra configure fields (compared to [CLI client](#cli-client))
     "client_to_query_stats": "MyClient1",  // it should be a client as an MCDR plugin, with stats_helper plugin installed in the MCDR
     "client_to_query_online": "MyClient2",  // a client described in the following section "Client to respond online command"
     "qq_to_mc": True,  //如果为True 则自动转发qq消息到mc
-	"mc_to_qq": False,  //如果为True 则自动转发mc消息到qq
-	"mcsm_api_addr": "",  //MCSM API地址，示例：127.0.0.1:1145 可不填，不填则禁用!!info
-	"mcsm_api_key": "",   //MCSM API KEY
-	"enable_ChatImage_support": False //如果为True 则不会修改图片的cq码，来支持ChatImage mod
+    "mc_to_qq": False,  //如果为True 则自动转发mc消息到qq
+    "mcsm_api_addr": "",  //MCSM API地址，示例：127.0.0.1:1145 可不填，不填则禁用!!info
+    "mcsm_api_key": "",   //MCSM API KEY
+    "enable_ChatImage_support": False //如果为True 则不会修改图片的cq码，来支持ChatImage mod
 ```
 
 ## Kaiheila bot client
