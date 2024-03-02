@@ -3,8 +3,6 @@ A specific client for responding !!online command for multiple bungeecord instan
 """
 import collections
 import functools
-import re
-import sys
 import traceback
 from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Lock
@@ -64,10 +62,11 @@ class OnlineChatClient(ChatBridgeClient):
 	@staticmethod
 	def handle_bungee(updater: Callable[[str, Collection[str]], Any], respond: str):
 		for line in respond.splitlines():
-			matched = re.fullmatch(r'\[([^]]+)] \(\d+\): (.*)', line)
-			if matched:
-				server_name = matched.group(1)
-				player_list = set(filter(None, matched.group(2).split(', ')))
+			if not line.startswith('Total players online:'):
+				server_name = line.split('] (', 1)[0][1:]
+				player_list = set(line.split('): ')[-1].split(', '))
+				if '' in player_list:
+					player_list.remove('')
 				updater(server_name, player_list)
 
 	@staticmethod
@@ -98,17 +97,17 @@ class OnlineChatClient(ChatBridgeClient):
 		with ThreadPoolExecutor() as pool:
 			for server in config.server_list:
 				pool.submit(self.query_server, server, 'list', lambda data, svr=server: self.handle_minecraft(updater, svr, data))
-			for server in config.bungeecord_list:
-				pool.submit(self.query_server, server, 'glist all', lambda data: self.handle_bungee(updater, data))
+#			for server in config.bungeecord_list:
+#				pool.submit(self.query_server, server, 'glist', lambda data: self.handle_bungee(updater, data))
 
 		counter_sorted = sorted([(key, value) for key, value in counter.items()], key=functools.cmp_to_key(self.server_comparator))
 		player_set_all = set()
-		result: List[str] = ['Players in {} Minecraft servers:'.format(len(list(filter(lambda i: i[1], counter_sorted))))]
+		result: List[str] = ['以下 {} 个服务器中有玩家在线 :'.format(len(list(filter(lambda i: i[1], counter_sorted))))]
 		for server_name, player_set in counter_sorted:
 			if player_set:
 				player_set_all.update(player_set)
-				result.append('[{}] ({}): {}'.format(server_name, len(player_set), ', '.join(sorted(player_set, key=lambda x: x.upper()))))
-		result.append('Total players online: {}'.format(len(player_set_all)))
+				result.append('\n[{}] {}人在线:\n{}'.format(server_name, len(player_set), '\n'.join(sorted(player_set, key=lambda x: x.upper()))))
+		result.append('\n总在线人数: {}'.format(len(player_set_all)))
 		return result
 
 
@@ -136,11 +135,7 @@ def main():
 	config = utils.load_config(ClientConfigFile, OnlineConfig)
 	chatClient = OnlineChatClient.create(config)
 	utils.start_guardian(chatClient)
-	if sys.stdin.isatty():
-		console_input_loop()
-	else:
-		utils.wait_until_terminate()
-		chatClient.stop()
+	console_input_loop()
 
 
 if __name__ == '__main__':
