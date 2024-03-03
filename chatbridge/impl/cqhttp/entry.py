@@ -35,8 +35,6 @@ StatsHelpMessage = '''
 !!stats custom time_since_rest -bot
 '''.strip()
 
-f"{CqHttpConfig}"
-
 @new_thread('get_server_info')
 def get_server_info(self):
 	url = f"http://{self.config.mcsm_api_addr}/api/service/remote_services_system/?apikey={self.config.mcsm_api_key}"
@@ -67,7 +65,7 @@ def get_server_info(self):
 class CQBot(websocket.WebSocketApp):
 	def __init__(self, config: CqHttpConfig):
 		self.config = config
-		websocket.enableTrace(True)
+		websocket.enableTrace(False)
 		url = 'ws://{}:{}/'.format(self.config.ws_address, self.config.ws_port)
 		if self.config.access_token is not None:
 			url += '?access_token={}'.format(self.config.access_token)
@@ -86,6 +84,7 @@ class CQBot(websocket.WebSocketApp):
 			data = json.loads(message)
 			if data.get('post_type') == 'message' and data.get('message_type') == 'group':
 				if data.get('anonymous') is None and data['group_id'] == self.config.react_group_id:
+
 					self.logger.info('QQ chat message: {}'.format(data))
 					args = data['raw_message'].split(' ')
 
@@ -112,9 +111,7 @@ class CQBot(websocket.WebSocketApp):
 						if re.search(pattern, message):
 							id_list = re.findall(pattern, message)
 							for id in id_list:
-								data = {"action": "/get_group_member_info","params": {"group_id": self.config.react_group_id,"user_id": id,"no_cache": True}}
-								self.send(json.dumps(data))
-								card = self.recv().json()['data']['card']
+								card = requests.get(f"http://{self.config.http_address}:{self.config.http_port}/get_group_member_info?group_id=907575552&user_id={id}&no_cache=true&access_token={self.config.access_token}").json()['data']['card']
 								message = re.sub(pattern, f"[@{card}]", message, count=1)
 						text = html.unescape(message)
 						chatClient.broadcast_chat(text, sender)
@@ -234,8 +231,6 @@ class CqHttpChatBridgeClient(ChatBridgeClient):
 				cq_bot.send_text(text)
 		except:
 			self.logger.exception('Error in on_custom()')
-
-
 
 def main():
 	global chatClient, cq_bot
