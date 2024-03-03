@@ -35,11 +35,11 @@ StatsHelpMessage = '''
 !!stats custom time_since_rest -bot
 '''.strip()
 
-
+f"{CqHttpConfig}"
 
 @new_thread('get_server_info')
 def get_server_info(self):
-	url = f"http://{self.config.mcsm_api_addr}/api/service/remote_services_system/?apikey={self.config.mcsm_api_addr}"
+	url = f"http://{self.config.mcsm_api_addr}/api/service/remote_services_system/?apikey={self.config.mcsm_api_key}"
 	headers = {"x-requested-with": "xmlhttprequest"}
 	req = requests.get(url, headers=headers)
 	data = req.json()
@@ -58,7 +58,7 @@ def get_server_info(self):
 			plt.xlabel("时间")
 			plt.legend()
 			plt.grid()
-			plt.savefig(f'{self.config.gqcq_path}\data\images\server_{i+1}.png', dpi=300)
+			plt.savefig(f'{self.config.gocq_path}\data\images\server_{i+1}.png', dpi=300)
 			self.send_text(f"服务器{i+1}的信息如下：\n实例(正常/总数)：{server['instance']['running']}/{server['instance']['total']}\n内存使用情况：{(server['system']['totalmem']-server['system']['freemem'])/1024**3:.2f}GB/{server['system']['totalmem']/1024**3:.2f}GB\n内存占用率：{server['system']['memUsage']*100:.2f}%\nCPU占用率：{server['system']['cpuUsage']*100:.2f}%\n[CQ:image,file=server_{i+1}.png]")
 
 	else:
@@ -121,7 +121,7 @@ class CQBot(websocket.WebSocketApp):
 
 					if len(args) == 1 and args[0] == '!!info':
 						self.logger.info('!!info command triggered')
-						self.send_text('正在通过 api.tqmcraft.net 获取服务器运行信息，请稍后...')
+						self.send_text('正在获取服务器运行信息，请稍后...')
 						get_server_info(self)
 
 					if len(args) == 1 and args[0] == '!!online':
@@ -184,7 +184,7 @@ class CqHttpChatBridgeClient(ChatBridgeClient):
 		if cq_bot is None:
 			return
 		try:
-			if CQBot.config.mc_to_qq == False:
+			if CqHttpConfig.mc_to_qq == False:
 				try:
 					prefix, message = payload.message.split(' ', 1)
 				except:
