@@ -3,6 +3,9 @@ import json
 import re
 from mcdreforged.api.all import *
 from typing import Optional
+import hashlib
+from datetime import datetime
+import random
 
 import requests
 import matplotlib.pyplot as plt
@@ -26,6 +29,7 @@ CQHelpMessage = '''
 !!info 获取服务器运行信息
 !!online: 显示在线玩家列表
 !!stats <类别> <内容> [<-bot>]: 查询统计信息 <类别>.<内容> 的排名
+!!jrrp 获取今日人品
 '''.strip()
 StatsHelpMessage = '''
 !!stats <类别> <内容> [<-bot>]
@@ -143,6 +147,12 @@ class CQBot(websocket.WebSocketApp):
 							chatClient.send_command(client, command)
 						else:
 							self.send_text('ChatBridge 客户端离线')
+					
+					if len(args) == 1 and args[0] == "!!jrrp":
+						hash_object = hashlib.md5((data["uesr_id"] + datetime.now().strftime('%Y-%m-%d')).encode())
+						random.seed(int(hash_object.hexdigest(), 16))
+						jrrp = random.randint(0,100)
+						self.send_text(f"您的今日人品为：{jrrp}")
 		except:
 			self.logger.exception('Error in on_message()')
 
