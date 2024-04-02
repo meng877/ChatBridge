@@ -149,7 +149,7 @@ class CQBot(websocket.WebSocketApp):
 							self.send_text('ChatBridge 客户端离线')
 					
 					if len(args) == 1 and args[0] == "!!jrrp":
-						hash_object = hashlib.md5((data["sender"]["uesr_id"] + datetime.now().strftime('%Y-%m-%d')).encode())
+						hash_object = hashlib.md5((data["sender"]["user_id"] + datetime.now().strftime('%Y-%m-%d')).encode())
 						random.seed(int(hash_object.hexdigest(), 16))
 						jrrp = random.randint(0,100)
 						self.send_text(f"您的今日人品为：{jrrp}")
