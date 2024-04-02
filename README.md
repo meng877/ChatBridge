@@ -15,6 +15,7 @@
 将!!online 汉化并添加换行
 
 添加对[ChatImage mod]https://github.com/kitUIN/ChatImage 的支持选项
+
 !!jrrp 今日人品
 
 !!info 效果:![3608cfa99a9ad724f799be77b186288](https://github.com/meng877/ChatBridge/assets/58868172/57b3fe90-56e4-4f16-897d-6af19e2778b3)
