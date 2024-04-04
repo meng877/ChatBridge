@@ -115,7 +115,7 @@ class CQBot(websocket.WebSocketApp):
 						if re.search(pattern, message):
 							id_list = re.findall(pattern, message)
 							for id in id_list:
-								card = requests.get(f"http://{self.config.http_address}:{self.config.http_port}/get_group_member_info?group_id=907575552&user_id={id}&no_cache=true&access_token={self.config.access_token}").json()['data']['card']
+								card = requests.get(f"http://{self.config.http_address}:{self.config.http_port}/get_group_member_info?group_id={self.config.react_group_id}&user_id={id}&no_cache=true&access_token={self.config.access_token}").json()['data']['card']
 								message = re.sub(pattern, f"[@{card}]", message, count=1)
 						text = html.unescape(message)
 						chatClient.broadcast_chat(text, sender)
