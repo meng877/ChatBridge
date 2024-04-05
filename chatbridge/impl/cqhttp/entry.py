@@ -152,7 +152,7 @@ class CQBot(websocket.WebSocketApp):
 						hash_object = hashlib.md5((str(data["sender"]["user_id"]) + datetime.now().strftime('%Y-%m-%d')).encode())
 						random.seed(int(hash_object.hexdigest(), 16))
 						jrrp = random.randint(0,100)
-						self.send_text(f'[CQ:at,qq={data["sender"]["user_id"]}]你今天的人品值为 {jrrp} ，{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}')
+						self.send_text(f"[CQ:at,qq={data['sender']['user_id']}]你今天的人品值为{jrrp}\n{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}")
 		except:
 			self.logger.exception('Error in on_message()')
 
