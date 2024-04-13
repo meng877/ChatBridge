@@ -39,6 +39,9 @@ StatsHelpMessage = '''
 !!stats custom time_since_rest -bot
 '''.strip()
 
+scores = {}
+used_jrrp = []
+
 @new_thread('get_server_info')
 def get_server_info(self):
 	url = f"http://{self.config.mcsm_api_addr}/api/service/remote_services_system/?apikey={self.config.mcsm_api_key}"
@@ -149,10 +152,22 @@ class CQBot(websocket.WebSocketApp):
 							self.send_text('ChatBridge 客户端离线')
 					
 					if len(args) == 1 and args[0] == "!!jrrp":
+						global today, scores, used_jrrp
 						hash_object = hashlib.md5((str(data["sender"]["user_id"]) + datetime.now().strftime('%Y-%m-%d')).encode())
+						if datetime.now().strftime('%Y-%m-%d') != today:
+							scores = {}
+							used_jrrp = []
+						today = datetime.now().strftime('%Y-%m-%d')
 						random.seed(int(hash_object.hexdigest(), 16))
 						jrrp = random.randint(0,100)
-						self.send_text(f"[CQ:at,qq={data['sender']['user_id']}]你今天的人品值为{jrrp}\n{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}")
+						if data["sender"]["user_id"] not in used_jrrp:
+							scores[sender] = jrrp
+							used_jrrp.append(data["sender"]["user_id"])
+						sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+						leaderboard = "====== 今日排行榜 ======\n"
+						for sender, score in sorted_scores:
+							leaderboard += f"{sender} : {score}\n"
+						self.send_text(f"[CQ:at,qq={data['sender']['user_id']}]你今天的人品值为{jrrp}\n{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}\n{leaderboard}")
 		except:
 			self.logger.exception('Error in on_message()')
 
@@ -243,7 +258,8 @@ class CqHttpChatBridgeClient(ChatBridgeClient):
 			self.logger.exception('Error in on_custom()')
 
 def main():
-	global chatClient, cq_bot
+	global chatClient, cq_bot, today
+	today = datetime.now().strftime('%Y-%m-%d')
 	config = utils.load_config(ConfigFile, CqHttpConfig)
 	chatClient = CqHttpChatBridgeClient.create(config)
 	utils.start_guardian(chatClient)
