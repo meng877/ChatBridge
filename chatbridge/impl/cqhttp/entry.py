@@ -165,8 +165,8 @@ class CQBot(websocket.WebSocketApp):
 							used_jrrp.append(data["sender"]["user_id"])
 						sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
 						leaderboard = "====== 今日排行榜 ======\n"
-						for sender, score in sorted_scores:
-							leaderboard += f"{sender} : {score}\n"
+						for name, score in sorted_scores:
+							leaderboard += f"{name} : {score}\n"
 						self.send_text(f"[CQ:at,qq={data['sender']['user_id']}]你今天的人品值为{jrrp}\n{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}\n{leaderboard}")
 		except:
 			self.logger.exception('Error in on_message()')
