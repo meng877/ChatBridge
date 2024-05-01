@@ -151,23 +151,26 @@ class CQBot(websocket.WebSocketApp):
 						else:
 							self.send_text('ChatBridge 客户端离线')
 					
-					if len(args) == 1 and args[0] == "!!jrrp":
-						global today, scores, used_jrrp
-						hash_object = hashlib.md5((str(data["sender"]["user_id"]) + datetime.now().strftime('%Y-%m-%d')).encode())
+					if len(args) >= 1 and args[0] == "!!jrrp":
+						global today, scores, used_jrrp, leaderboard
 						if datetime.now().strftime('%Y-%m-%d') != today:
 							scores = {}
 							used_jrrp = []
 						today = datetime.now().strftime('%Y-%m-%d')
-						random.seed(int(hash_object.hexdigest(), 16))
-						jrrp = random.randint(0,100)
-						if data["sender"]["user_id"] not in used_jrrp:
-							scores[sender] = jrrp
-							used_jrrp.append(data["sender"]["user_id"])
-						sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
-						leaderboard = "====== 今日排行榜 ======\n"
-						for name, score in sorted_scores:
-							leaderboard += f"{name} : {score}\n"
-						self.send_text(f"[CQ:at,qq={data['sender']['user_id']}]你今天的人品值为{jrrp}\n{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}\n{leaderboard}")
+						if len(args) == 1:
+							hash_object = hashlib.md5((str(data["sender"]["user_id"]) + datetime.now().strftime('%Y-%m-%d')).encode())
+							random.seed(int(hash_object.hexdigest(), 16))
+							jrrp = random.randint(0,100)
+							if data["sender"]["user_id"] not in used_jrrp:
+								scores[sender] = jrrp
+								used_jrrp.append(data["sender"]["user_id"])
+							sorted_scores = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+							leaderboard = "====== 今日排行榜 ======\n"
+							for name, score in sorted_scores:
+								leaderboard += f"{name} : {score}\n"
+							self.send_text(f"[CQ:at,qq={data['sender']['user_id']}]你今天的人品值为{jrrp}\n{f'厉不厉害你{sender}哥' if jrrp > 60 else '你干嘛哈哈呦'}")
+						if len(args) > 1 and args[1] == "phb":
+							self.send_text(leaderboard)
 		except:
 			self.logger.exception('Error in on_message()')
 
