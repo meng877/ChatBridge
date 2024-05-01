@@ -30,6 +30,7 @@ CQHelpMessage = '''
 !!online: 显示在线玩家列表
 !!stats <类别> <内容> [<-bot>]: 查询统计信息 <类别>.<内容> 的排名
 !!jrrp 获取今日人品
+!!jrrp phb 获取今日人品排行榜
 '''.strip()
 StatsHelpMessage = '''
 !!stats <类别> <内容> [<-bot>]
